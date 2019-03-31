@@ -241,7 +241,6 @@ SECTIONS
 	. += PAGE_SIZE;
 #endif
 
-
 	_end = .;
 
 	STABS_DEBUG

@@ -11395,5 +11395,3 @@ static int __init hmp_tbsoftlanding_init(void)
 }
 late_initcall(hmp_tbsoftlanding_init);
 #endif	/* CONFIG_SCHED_HMP_TASK_BASED_SOFTLANDING */
-
-

@@ -1257,6 +1257,8 @@ struct hmp_domain {
 	struct list_head hmp_domains;
 };
 
+#define HMP_BOOSTING_ENABLE 	1
+#define HMP_BOOSTING_DISABLE	0
 extern int set_hmp_boost(int enable);
 extern int set_hmp_semiboost(int enable);
 extern int set_hmp_boostpulse(int duration);
@@ -1435,6 +1437,10 @@ struct sched_rt_entity {
 	unsigned long watchdog_stamp;
 	unsigned int time_slice;
 
+	/* Accesses for these must be guarded by rq->lock of the task's rq */
+	bool schedtune_enqueued;
+	struct hrtimer schedtune_timer;
+
 	struct sched_rt_entity *back;
 #ifdef CONFIG_RT_GROUP_SCHED
 	struct sched_rt_entity	*parent;
@@ -1571,7 +1577,7 @@ struct task_struct {
 	struct sched_rt_entity rt;
 #ifdef CONFIG_SCHED_USE_FLUID_RT
 	int victim_flag;
-#endif	
+#endif
 #ifdef CONFIG_CGROUP_SCHED
 	struct task_group *sched_task_group;
 #endif
@@ -1697,6 +1703,10 @@ struct task_struct {
 	cputime_t utime, stime, utimescaled, stimescaled;
 	cputime_t gtime;
 	unsigned long long cpu_power;
+#ifdef CONFIG_CPU_FREQ_TIMES
+	u64 *time_in_state;
+	unsigned int max_state;
+#endif
 	struct prev_cputime prev_cputime;
 #ifdef CONFIG_VIRT_CPU_ACCOUNTING_GEN
 	seqlock_t vtime_seqlock;
@@ -2827,7 +2837,14 @@ static inline int copy_thread_tls(
 }
 #endif
 extern void flush_thread(void);
-extern void exit_thread(void);
+
+#ifdef CONFIG_HAVE_EXIT_THREAD
+extern void exit_thread(struct task_struct *tsk);
+#else
+static inline void exit_thread(struct task_struct *tsk)
+{
+}
+#endif
 
 extern void exit_files(struct task_struct *);
 extern void __cleanup_sighand(struct sighand_struct *);

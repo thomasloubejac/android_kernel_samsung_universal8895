@@ -74,6 +74,7 @@
 #include <linux/binfmts.h>
 #include <linux/context_tracking.h>
 #include <linux/compiler.h>
+#include <linux/cpufreq_times.h>
 #include <linux/exynos-ss.h>
 
 #include <linux/sched/sysctl.h>
@@ -2999,7 +3000,7 @@ static ssize_t heavy_task_cpu_show(struct device *dev,
             remaining_load = cfs_load - task_util;
             avg_load = remaining_load / (no_task-1);
             if(avg_load > HEAVY_TASK_LOAD_THRESHOLD)
-                count++; 
+                count++;
         }
     }
 
@@ -6047,19 +6048,6 @@ static void rq_attach_root(struct rq *rq, struct root_domain *rd)
 
 	if (old_rd)
 		call_rcu_sched(&old_rd->rcu, free_rootdomain);
-}
-
-void sched_get_rd(struct root_domain *rd)
-{
-	atomic_inc(&rd->refcount);
-}
-
-void sched_put_rd(struct root_domain *rd)
-{
-	if (!atomic_dec_and_test(&rd->refcount))
-		return;
-
-	call_rcu_sched(&rd->rcu, free_rootdomain);
 }
 
 static int init_rootdomain(struct root_domain *rd)
