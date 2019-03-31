@@ -415,7 +415,8 @@ static int set_state_shutdown(struct clock_event_device *evt)
 	unsigned int cpu = smp_processor_id();
 
 	mevt = container_of(evt, struct mct_clock_event_device, evt);
-	exynos4_mct_tick_start(cycles, 0, mevt);
+	exynos4_mct_tick_stop(mevt, 1);
+	pr_info("%s: mct_tick_stop (cpu%d)\n", __func__, cpu);
 	return 0;
 }
 
