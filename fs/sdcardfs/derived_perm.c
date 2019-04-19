@@ -161,7 +161,6 @@ void get_derived_permission_new(struct dentry *parent, struct dentry *dentry,
 			info->data->userid = 100; /* default container no. */
 		else
 			info->data->userid = user_num;
-		set_top(info, info->data);
 		break;
 	case PERM_KNOX_ROOT:
 		if (qstr_case_eq(name, &q_Android))
@@ -174,7 +173,8 @@ void get_derived_permission_new(struct dentry *parent, struct dentry *dentry,
 			info->data->perm = PERM_KNOX_ANDROID_SHARED;
 			info->data->d_uid =
 				multiuser_get_uid(parent_data->userid, 0);
-			set_top(info, info->data);
+		} else {
+			set_top(info, parent_info);
 		}
 		break;
 	case PERM_KNOX_ANDROID_DATA:
@@ -183,7 +183,6 @@ void get_derived_permission_new(struct dentry *parent, struct dentry *dentry,
 		if (appid != 0 && !is_excluded(name->name, parent_data->userid))
 			info->data->d_uid =
 				multiuser_get_uid(parent_data->userid, appid);
-		set_top(info, info->data);
 		break;
 	case PERM_KNOX_ANDROID_SHARED:
 	case PERM_KNOX_ANDROID_PACKAGE:

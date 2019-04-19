@@ -571,9 +571,6 @@ static int verity_verify_io(struct dm_verity_io *io)
 	struct bvec_iter start;
 	unsigned b;
 
-	struct bio *bio;
-	struct bio_vec bv;
-	u8 *page;
 	for (b = 0; b < io->n_blocks; b++) {
 		int r;
 		sector_t cur_block = io->block + b;
